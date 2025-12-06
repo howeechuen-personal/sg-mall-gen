@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SG Random Gen</title>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/1000/merlion.png">
+    <style>
+        :root { --primary: #FF3366; --bg: #f4f4f7; --card: #ffffff; --text: #333333; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; padding-bottom: 50px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+        h1 { font-size: 24px; margin-bottom: 30px; color: #1a1a1a; font-weight: 800; }
+        .card { background: var(--card); width: 100%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin-bottom: 25px; text-align: center; transition: transform 0.2s; }
+        .card:active { transform: scale(0.98); }
+        h2 { font-size: 18px; margin-top: 0; margin-bottom: 15px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .result-box { font-size: 22px; font-weight: 700; min-height: 60px; display: flex; align-items: center; justify-content: center; margin: 20px 0; color: var(--primary); line-height: 1.3; }
+        .address-box { font-size: 14px; color: #888; font-weight: 400; margin-top: -10px; margin-bottom: 15px; min-height: 20px; }
+        select { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #eee; background: #fff; font-size: 16px; margin-bottom: 15px; outline: none; appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 15px top 50%; background-size: 12px auto; }
+        button { background-color: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 5px 15px rgba(255, 51, 102, 0.3); transition: opacity 0.2s; }
+        button:active { opacity: 0.8; transform: translateY(1px); }
+        .secondary-btn { background-color: #eee; color: #333; box-shadow: none; margin-top: 10px; }
+        .map-link { display: inline-block; margin-top: 15px; color: var(--primary); text-decoration: none; font-weight: 600; font-size: 14px; border-bottom: 1px dashed var(--primary); }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
+    </style>
+</head>
+<body>
+    <h1>🇸🇬 SG Generator</h1>
+    <div class="card">
+        <h2>Any Mall</h2>
+        <div id="result-1" class="result-box">Tap to decide</div>
+        <button onclick="generateAnyMall()">Pick a Mall</button>
+    </div>
+    <div class="card">
+        <h2>Mall By Region</h2>
+        <select id="region-select">
+            <option value="Central">Central Area (City/Orchard/CBD)</option>
+            <option value="North">North Region</option>
+            <option value="CentralSub">Central Region (Suburban/AMK)</option>
+            <option value="West">West Region</option>
+            <option value="East">East Region</option>
+            <option value="NorthEast">North-East Region</option>
+        </select>
+        <div id="result-2" class="result-box">Select region & go</div>
+        <button onclick="generateRegionalMall()">Pick Regional Mall</button>
+    </div>
+    <div class="card">
+        <h2>Random SG Address</h2>
+        <div id="result-3-code" class="result-box" style="font-family: monospace; letter-spacing: 2px;">??????</div>
+        <div id="result-3-address" class="address-box">Generating from ~1200+ spots...</div>
+        <button onclick="generateRandomLocation()">Generate Random Place</button>
+        <button onclick="copyPostal()" class="secondary-btn">Copy Postal</button>
+        <a id="map-link" href="#" target="_blank" class="map-link" style="display:none;">View on Google Maps</a>
+    </div>
+    <script>
+        const malls = {
+            Central: ["The Concourse","Golden Mile Complex","Golden Mile Tower","Keypoint","The Furniture Mall","Sultan Plaza","Textile Centre","Albert Complex","Albert Court","The Adelphi","The Arcade","Bencoolen Building","Burlington Square","Bugis Village","Caltex House","Capital Square","Capitol Building","Capitol Centre","China Square Central","CityLink Mall","Clifford Centre","Esplanade Mall","Far East Square","Fortune Centre","Fu Lu Shou Complex","Funan","Golden Shoe Carpark","High Street Centre","High Street Plaza","Hitachi Tower","Hong Leong Building","Iluma","International Plaza","Marina Square","Millenia Walk","North Bridge Centre","OUB Centre","One Fullerton","Bugis Junction","Paradiz Centre","Parklane Shopping Mall","Peace Centre","Peninsula Plaza","Peninsula Shopping Centre","Plaza By The Park","Raffles City","Raffles Hotel Arcade","Robinson Towers","Shaw Tower","Sim Lim Square","Suntec City","Stamford Court","Stamford House","Sunshine Plaza","Apollo Centre","Chinatown Point","Furama Hotel Shopping Centre","Pearl's Centre","People's Park Centre","People's Park Complex","Jalan Besar Plaza","Little India Arcade","Mustafa Centre","New World Centre","Tekka Mall","Serangoon Plaza","Sim Lim Tower","313@Somerset","Cathay Cineleisure","The Centrepoint","Cuppage Plaza","Cuppage Terrace","Delfi Orchard","DFS Singapore","Far East Plaza","Far East Shopping Centre","Forum The Shopping Mall","The Heeren","Hilton Shopping Gallery","International Building","ION Orchard","Liat Towers","Lucky Plaza","Mandarin Gallery","Midpoint Orchard","Ngee Ann City","Orchard Building","Orchard Central","Orchard Gateway","Orchard Plaza","Orchard Point","Orchard Shopping Centre","Orchard Towers","Pacific Plaza","Palais Renaissance","Paragon","Park Mall","Plaza Singapura","Royal Plaza on Scotts","Scotts Shopping Centre","Scotts Square","Shaw Centre","Shaw House","Singapore Shopping Centre","Tanglin Mall","Tanglin Shopping Centre","Tang Plaza","Tudor Court","Wheelock Place","Wisma Atria","Central Mall","Central Square","Clarke Quay","Concorde Shopping Centre","Great World","Kim Seng Plaza","Liang Court","Merchant Square","Riverside Plaza","Riverside Point","Robertson Walk","UE Square","Valley Point","HarbourFront Centre","VivoCity"],
+            North: ["888 Plaza","Causeway Point","Northpoint City","Sembawang Shopping Centre","Sun Plaza","Woodlands Civic Centre","Woodlands Mart","Woodlands North Plaza","Vista Point","Canberra Plaza","Wisteria Mall"],
+            CentralSub: ["Anchorpoint","AMK Hub","Balestier Complex","Balestier Plaza","Balmoral Plaza","Beauty World Centre","Beauty World Plaza","Bukit Timah Plaza","Bukit Timah Shopping Centre","Coronation Arcade","Coronation Plaza","Eastgate","Goldhill Centre","Goldhill Plaza","HDB Hub","Holland Road Shopping Centre","Ikea Alexandra","Joo Chiat Complex","Junction 8","King's Arcade","Novena Square","Odeon Katong","Paramount Shopping Centre","Queensway Shopping Centre","Rochester Mall","Roxy Square","Shaw Plaza","Siglap Centre","Sin Ming Plaza","Thomson Plaza","Tiong Bahru Plaza","United Square"],
+            West: ["Boon Lay Shopping Centre","Bukit Panjang Plaza","The Clementi Mall","Fajar Shopping Centre","Gek Poh Shopping Centre","West Coast Plaza","Greenridge Shopping Centre","IMM","JCube","Jem","Junction 10","Jurong Point","Keat Hong Shopping Centre","Limbang Shopping Centre","Lot One","Pasir Panjang Village","Pioneer Mall","Sunshine Place","The Rail Mall","West Mall","Yew Tee Point","Yew Tee Shopping Centre","Westgate","The Star Vista","Le Quest"],
+            East: ["I12 Katong","Bedok Point","Century Square","Changi City Point","Eastpoint Mall","Elias Mall","Ikea Tampines","Katong Plaza","Katong Shopping Centre","Loyang Point","Parkway Centre","Parkway Parade","Pasir Ris West Plaza","Tampines Mall","Tampines Mart","Tampines 1","White Sands","Jewel Changi","PLQ Mall","Kinex","Bedok Mall","Kallang Wave Mall","Downtown East"],
+            NorthEast: ["Compass One","The Seletar Mall","Fernvale Point","Heartland Mall","Hougang Green","Hougang Mall","Kovan Centre","NEX","Punggol Plaza","Rivervale Plaza","Rivervale Mall","Upper Serangoon Shopping Centre","Waterway Point","Oasis Terraces"]
+        };
+        const deepSeedList = [{code: "450002", addr: "2 Dunbar Walk (Landed)"}, {code: "554808", addr: "8 Jalan Pacheli (Landed)"}, {code: "577721", addr: "12 Jalan Chempaka Kuning (Landed)"}, {code: "455242", addr: "45 Siglap Drive (Landed)"}, {code: "288001", addr: "10 Seletar Hills Dr (Landed)"}, {code: "544738", addr: "3 Jalan Kayu (Shophouse)"}, {code: "427671", addr: "128 East Coast Rd (Shophouse)"}, {code: "207635", addr: "55 Serangoon Rd (Shophouse)"}, {code: "757758", addr: "15 Woodlands Loop (Industrial)"}, {code: "629140", addr: "10 Tuas West Dr (Industrial)"}, {code: "408600", addr: "10 Ubi Crescent (Industrial)"}, {code: "531902", addr: "5 Defu Lane 10 (Industrial)"}, {code: "159303", addr: "3 Alexandra Distripark (Industrial)"}, {code: "368357", addr: "50 Tai Seng Ave (Industrial)"}, {code: "609601", addr: "International Business Park"}, {code: "117611", addr: "Science Park Dr (Office)"}, {code: "079903", addr: "10 Anson Road (Office)"}, {code: "048624", addr: "50 Raffles Place (Office)"}, {code: "238881", addr: "111 Somerset Rd (Office)"}, {code: "188979", addr: "200 Jalan Sultan (Office)"}, {code: "339411", addr: "11 Kallang Place (Industrial)"}, {code: "619159", addr: "18 Boon Lay Way (Industrial)"}, {code: "417818", addr: "20 Eunos Road 8"}, {code: "768413", addr: "Yishun Industrial Park A"}, {code: "638363", addr: "15 Pioneer Walk (Industrial)"}, {code: "528559", addr: "Changi South St 1 (Industrial)"}, {code: "109679", addr: "Telok Blangah House"}, {code: "168730", addr: "Tiong Bahru Estate"}, {code: "271003", addr: "Holland Ave HDB"}, {code: "500140", addr: "Lor 1 Toa Payoh Condos"}, {code: "469974", addr: "Bedok Reservoir Park area"}, {code: "569830", addr: "Ang Mo Kio Ave 8 (School)"}, {code: "639798", addr: "Pioneer Rd North"}, {code: "138667", addr: "Biopolis Way"}, {code: "098633", addr: "Sentosa Gateway (Random)"}, {code: "819643", addr: "Changi Coast Rd"}, {code: "718896", addr: "Sungei Kadut Loop"}, {code: "628052", addr: "Benoi Sector"}, {code: "486048", addr: "Expo Drive"}, {code: "117576", addr: "Prince George's Park"}, {code: "599908", addr: "Bukit Timah Rd (Condo)"}, {code: "258353", addr: "Claymore Hill (Condo)"}, {code: "437437", addr: "Meyer Road (Condo)"}, {code: "579727", addr: "Bishan St 21 (HDB)"}, {code: "320108", addr: "McNair Rd"}, {code: "210668", addr: "Chander Rd"}, {code: "080005", addr: "Cantonment Close"}, {code: "090004", addr: "Everton Park"}];
+        function generateHDBList() {
+            const hdbZones = [ ["76", 101, 299, "Yishun Ring Rd"], ["76", 601, 899, "Yishun Ave 4"], ["56", 201, 699, "Ang Mo Kio Ave 3/10"], ["52", 101, 299, "Tampines St 11/12"], ["52", 801, 899, "Tampines Ave 4"], ["64", 401, 550, "Jurong West St 41"], ["64", 601, 999, "Jurong West St 61/91"], ["73", 501, 899, "Woodlands Dr 14/16"], ["46", 1, 99, "Bedok South Ave 1"], ["46", 101, 250, "Bedok North Rd"], ["46", 501, 750, "Bedok Reservoir Rd"], ["53", 401, 750, "Hougang Ave 8/10"], ["68", 201, 799, "Choa Chu Kang Ave 1/4"], ["31", 1, 250, "Lor 1 Toa Payoh"], ["12", 301, 450, "Clementi Ave 2/5"], ["65", 101, 399, "Bukit Batok West/East"], ["54", 101, 450, "Compassvale/Rivervale (Sengkang)"] ];
+            let generated = [];
+            hdbZones.forEach(zone => { const [sector, start, end, road] = zone; for(let i = 0; i < 60; i++) { const blockNum = Math.floor(Math.random() * (end - start + 1)) + start; const blockStr = blockNum.toString().padStart(3, '0'); generated.push({ code: sector + blockStr, addr: `Blk ${blockNum} ${road}` }); } });
+            return generated;
+        }
+        const hdbList = generateHDBList();
+        const allRandomLocations = [...deepSeedList, ...hdbList];
+        let lastAnyMall = "";
+        let lastRegionalMall = "";
+        function randomInt(max) { return Math.floor(Math.random() * max); }
+        function animate(elementId) { const el = document.getElementById(elementId); el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); }
+        function generateAnyMall() { animate('result-1'); const allMalls = Object.values(malls).flat(); const candidates = allMalls.filter(m => m !== lastAnyMall); if (candidates.length === 0) return; const pick = candidates[randomInt(candidates.length)]; lastAnyMall = pick; document.getElementById('result-1').innerText = pick; }
+        function generateRegionalMall() { animate('result-2'); const region = document.getElementById('region-select').value; const regionList = malls[region]; const candidates = regionList.filter(m => m !== lastRegionalMall); if (candidates.length === 0) { document.getElementById('result-2').innerText = lastRegionalMall; return; } const pick = candidates[randomInt(candidates.length)]; lastRegionalMall = pick; document.getElementById('result-2').innerText = pick; }
+        function generateRandomLocation() { animate('result-3-code'); document.getElementById('result-3-code').innerText = "......"; document.getElementById('result-3-address').innerText = "Scanning Singapore map..."; document.getElementById('map-link').style.display = 'none'; setTimeout(() => { const pick = allRandomLocations[randomInt(allRandomLocations.length)]; document.getElementById('result-3-code').innerText = pick.code; document.getElementById('result-3-address').innerText = pick.addr; const mapLink = document.getElementById('map-link'); mapLink.href = `https://www.google.com/maps/search/${pick.code}`; mapLink.style.display = 'inline-block'; }, 400); }
+        function copyPostal() { const code = document.getElementById('result-3-code').innerText; if(code.length === 6 && !isNaN(code)) { const textarea = document.createElement('textarea'); textarea.value = code; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); alert("Copied: " + code); } else { alert("Generate a code first!"); } }
+        if ('serviceWorker' in navigator) { if (window.location.protocol.startsWith('http')) { navigator.serviceWorker.register('sw.js').then(() => console.log('Service Worker Registered')).catch(err => console.log('SW Registration Failed:', err)); } }
+    </script>
+</body>
+</html>
